@@ -438,6 +438,21 @@ func (p *TBinaryProtocol) ReadString() (value string, err error) {
 	return p.readStringBody(size)
 }
 
+var BytesPool = sync.Pool{
+	New: func() interface{} {
+		return make([]byte, 256)
+	},
+}
+
+func getBytes(size int) []byte {
+	buf := BytesPool.Get().([]byte)
+	if cap(buf) < size {
+		BytesPool.Put(buf)
+		buf = make([]byte, size)
+	}
+	return buf[:size]
+}
+
 func (p *TBinaryProtocol) ReadBinary() ([]byte, error) {
 	size, e := p.ReadI32()
 	if e != nil {
@@ -451,7 +466,7 @@ func (p *TBinaryProtocol) ReadBinary() ([]byte, error) {
 	}
 
 	isize := int(size)
-	buf := make([]byte, isize)
+	buf := getBytes()[:isize]
 	_, err := io.ReadFull(p.trans, buf)
 	return buf, NewTProtocolException(err)
 }
