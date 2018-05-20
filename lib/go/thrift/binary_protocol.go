@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"sync"
 )
 
 type TBinaryProtocol struct {
