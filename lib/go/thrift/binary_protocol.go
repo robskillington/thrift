@@ -466,7 +466,7 @@ func (p *TBinaryProtocol) ReadBinary() ([]byte, error) {
 	}
 
 	isize := int(size)
-	buf := getBytes()[:isize]
+	buf := getBytes(isize)[:isize]
 	_, err := io.ReadFull(p.trans, buf)
 	return buf, NewTProtocolException(err)
 }
